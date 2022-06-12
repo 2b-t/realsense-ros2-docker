@@ -1,0 +1,11 @@
+{
+  "name": "Docker Realsense ROS2",
+  "dockerComposeFile": [
+    "../docker/docker-compose-gui.yml" // Alternatives: "../docker/docker-compose.yml", "../docker/docker-compose-gui-nvidia.yml", "../docker/docker-compose-nvidia.yml"
+  ],
+  "service": "realsense_ros2",
+	"workspaceFolder": "/ros2_ws",
+  "shutdownAction": "stopCompose",
+  "extensions": [
+  ]
+}

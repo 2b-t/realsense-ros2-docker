@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  realsense_ros2:
+    extends:
+      file: docker-compose-gui.yml
+      service: realsense_ros2
+    environment:
+     - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
