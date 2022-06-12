@@ -59,7 +59,7 @@ RUN apt-get update -y \
 ENV DEBIAN_FRONTEND=dialog
 ```
 
-### Installation from source
+### 1.2 Installation from source
 The installation from source is slightly more involved but more general. In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
 
 ```Dockerfile
@@ -172,24 +172,28 @@ The Intel Realsense driver has several serious flaws/bugs. Probably the main one
 Furthermore from time to time the software will give you cryptic error messages, for some restarting the corresponding software component miht help, for others you will find a fix googling and with others you will have to learn to live.
 The Realsense are pretty [picky about USB 3.0 cables](https://github.com/IntelRealSense/librealsense/issues/2045). If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
 
-After having connected the Realsense and starting the Docker with
+Build the Docker container with
+```shell
+$ docker compose -f docker-compose-gui.yml build
+```
+or directly with the `devcontainer` in Visual Studio Code. For Nvidia graphic cards the file `docker-compose-gui-nvidia.yml` in combination with the `nvidia-runtime` has to be used.
+After it is done building **connect the Realsense**, start the container
 ```shell
 $ docker compose -f docker-compose-gui.yml up
 ```
-or directly with the `devcontainer` in Visual Studio Code. For Nvidia graphic cards the file `docker-compose-gui-nvidia.yml` in combination with the `nvidia-runtime` has to be used.
-After it is done building connect the Realsense and see if you can detect it from inside the Docker by typing
+and see if you can **detect it from inside the Docker** by typing
 ```shell
 $ rs-enumerate-devices --compact
 ```
-Then continue to launch the viewer
+Then continue to launch the proprietary visualisation applet
 ```shell
 $ realsense-viewer
 ```
-Turn on the camera, see if you can see a three-dimensional image. Finally we can launch the ROS driver
+Turn on the camera inside the application, see if you can see a three-dimensional image. Finally we can **launch the ROS2 wrapper**
 ```shell
 $ ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true
 ```
-and in another terminal Rviz
+and in another terminal the ROS visualiser Rviz
 ```shell
 $ rosrun rviz2 rviz2
 ```
