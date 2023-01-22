@@ -1,4 +1,4 @@
-[![build](https://github.com/2b-t/realsense-ros2-docker/workflows/build/badge.svg)](https://github.com/2b-t/realsense-ros2-docker/actions/workflows/build.yml)
+[![build](https://github.com/2b-t/realsense-ros2-docker/workflows/build/badge.svg)](https://github.com/2b-t/realsense-ros2-docker/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Docker for Intel Realsense cameras on ROS2
 
