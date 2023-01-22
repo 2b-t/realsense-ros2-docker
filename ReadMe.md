@@ -1,27 +1,37 @@
 [![build](https://github.com/2b-t/realsense-ros2-docker/workflows/build/badge.svg)](https://github.com/2b-t/realsense-ros2-docker/actions/workflows/build.yml)
 
-# Docker for Intel Realsense cameras and ROS2
+# Docker for Intel Realsense cameras on ROS2
 
-Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022)
+Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022 - January 2023)
 
 ## 0. Overview
-This repository contains a Docker and all the documentation required to launch an Intel Realsense camera with ROS2. Currently **ROS2 Humble is not supported yet**, as it is not supported by the official ROS2 wrapper yet.
+This repository contains a Docker and all the documentation required to launch an [Intel Realsense camera](https://www.intel.co.uk/content/www/uk/en/architecture-and-technology/realsense-overview.html) with the [Robot Operating System ROS2](https://docs.ros.org/en/humble/index.html).
 
-## 1. Dockerfiles
-There are two different Dockerfiles given, one uses existing Debian packages while the other performs a full compilation from source.
+## 1. Creating a Docker
+There are two different approaches for creating a Docker for a Realsense camera, one uses existing **Debian packages** while the other performs a full **compilation from source**. It is then important to mount `/dev` as a volume so that the Docker can access the hardware.
 
-### 1.1 Installation Debian packages
-The relevant packages generally can be installed from Debian package. This is significantly simpler and less error prone but corresponding Debian packages might not be available for all Ubuntu versions. The corresponding Dockerfile can be found below. It is based on the installation guides for [`librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages) and [its ROS wrapper](https://github.com/IntelRealSense/realsense-ros/tree/ros2-beta).
+In the `docker-compose.yml` this is done with the options:
+
+```json
+    volumes:
+      - /dev:/dev
+    device_cgroup_rules:
+      - 'c 81:* rmw'
+      - 'c 189:* rmw'
+```
+
+### 1.1 Installation from Debian packages
+The relevant packages for most distributions can be installed from Debian packages. This is significantly simpler and less error prone but corresponding Debian packages might not be available for all Ubuntu versions. The corresponding Dockerfile can be found below. It is based on the installation guides for [`librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages) and [its ROS wrapper](https://github.com/IntelRealSense/realsense-ros/tree/ros2-beta).
 
 ```Dockerfile
-FROM ros:galactic-ros-base
+FROM ros:humble-perception
 
 ENV WS_DIR="/ros2_ws"
 WORKDIR ${WS_DIR}
 
 SHELL ["/bin/bash", "-c"]
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y \
  && apt-get install -y \
@@ -30,7 +40,7 @@ RUN apt-get update -y \
     git-all \
     software-properties-common
 
-# Install dependencies: See https://github.com/IntelRealSense/realsense-ros/tree/ros2-beta
+# Install dependencies: See https://github.com/IntelRealSense/realsense-ros/tree/ros2-development
 # Librealsense: See https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages
 RUN apt-get update -y \
  && apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE \
@@ -46,7 +56,7 @@ RUN apt-get update -y \
     ros-${ROS_DISTRO}-rviz2 \
  && mkdir src \
  && cd src \
- && git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-beta \
+ && git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-development \
  && cd .. \
  && apt-get install -y python3-rosdep \
  && source /opt/ros/${ROS_DISTRO}/setup.bash \
@@ -56,14 +66,14 @@ RUN apt-get update -y \
  && rosdep install -i --from-path src --rosdistro ${ROS_DISTRO} --skip-keys=librealsense2 -y \
  && colcon build
 
-ENV DEBIAN_FRONTEND=dialog
+ARG DEBIAN_FRONTEND=dialog
 ```
 
 ### 1.2 Installation from source
-The installation from source is slightly more involved but more general. In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
+The installation from source is slightly more involved but more general. It might work with ROS2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
 
 ```Dockerfile
-ARG BASE_IMAGE=ros:galactic-ros-base # ros:humble-perception is not supported yet
+ARG BASE_IMAGE=ros:humble-perception
 
 # The following steps are based on the offical multi-stage build: https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile
 #################################
@@ -144,7 +154,7 @@ RUN apt-get update \
     software-properties-common \
  && rm -rf /var/lib/apt/lists/*
 
-# The following steps are based on: https://github.com/IntelRealSense/realsense-ros/tree/ros2-beta
+# The following steps are based on: https://github.com/IntelRealSense/realsense-ros/tree/ros2-development
 ENV WS_DIR="/ros2_ws"
 WORKDIR ${WS_DIR}
 RUN apt-get update -y \
@@ -152,7 +162,7 @@ RUN apt-get update -y \
     ros-${ROS_DISTRO}-rviz2 \
  && mkdir src \
  && cd src \
- && git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-beta \
+ && git clone https://github.com/IntelRealSense/realsense-ros.git -b ros2-development \
  && cd .. \
  && apt-get install -y python3-rosdep \
  && source /opt/ros/${ROS_DISTRO}/setup.bash \
@@ -168,20 +178,24 @@ CMD [ "rs-enumerate-devices", "--compact" ]
 ```
 
 ## 2. Launching
-The Intel Realsense driver has several serious flaws/bugs. Probably the main one is that it is closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360). If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported.
-Furthermore from time to time the software will give you cryptic error messages, for some restarting the corresponding software component miht help, for others you will find a fix googling and with others you will have to learn to live.
-The Realsense are pretty [picky about USB 3.0 cables](https://github.com/IntelRealSense/librealsense/issues/2045). If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
+Allow the container to display contents on your host machine by typing
 
-Build the Docker container with
+```bash
+$ xhost +local:root
+```
+
+Then build the Docker container with
+
 ```shell
 $ docker compose -f docker-compose-gui.yml build
 ```
-or directly with the `devcontainer` in Visual Studio Code. For Nvidia graphic cards the file `docker-compose-gui-nvidia.yml` in combination with the `nvidia-runtime` has to be used.
+or directly with the [`devcontainer` in Visual Studio Code](https://code.visualstudio.com/docs/devcontainers/containers). For Nvidia graphic cards the file `docker-compose-gui-nvidia.yml` in combination with the [`nvidia-container-runtime`](https://nvidia.github.io/nvidia-container-runtime/) has to be used instead.
 After it is done building **connect the Realsense**, start the container
+
 ```shell
 $ docker compose -f docker-compose-gui.yml up
 ```
-and see if you can **detect it from inside the Docker** by typing
+and see if you can **detect it from inside the Docker** by typing inside the Docker
 ```shell
 $ rs-enumerate-devices --compact
 ```
@@ -206,3 +220,9 @@ in combination with
 $ ros2 topic info <topic_name>
 ```
 to find out what display type has to be selected in Rviz.
+
+## 3. Debugging
+
+The Intel Realsense driver has several serious flaws/bugs. Probably the main one is that it is **closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360)**. If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported. Furthermore from time to time the software will give you cryptic error messages, for some restarting the corresponding software component might help, for others you will find a fix googling and with others you will have to learn to live.
+The Realsense are **pretty [picky about USB 3.x cables](https://github.com/IntelRealSense/librealsense/issues/2045)**. If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
+
