@@ -2,7 +2,7 @@
 
 # Docker for Intel Realsense cameras on ROS2
 
-Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022 - January 2023)
+Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022 - February 2023)
 
 ## 0. Overview
 This repository contains a Docker and all the documentation required to launch an [Intel Realsense camera](https://www.intel.co.uk/content/www/uk/en/architecture-and-technology/realsense-overview.html) with the [Robot Operating System ROS2](https://docs.ros.org/en/humble/index.html).
@@ -21,7 +21,7 @@ In the `docker-compose.yml` this is done with the options:
 ```
 
 ### 1.1 Installation from Debian packages
-The relevant packages for most distributions can be installed from Debian packages. This is significantly simpler and less error prone but corresponding Debian packages might not be available for all Ubuntu versions. The corresponding Dockerfile can be found below. It is based on the installation guides for [`librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages) and [its ROS wrapper](https://github.com/IntelRealSense/realsense-ros/tree/ros2-beta).
+The relevant packages for `amd64` and most distributions can be installed from Debian packages. This is significantly simpler and less error prone than a full compilation from source but corresponding Debian packages might not be available for all Ubuntu versions and are sadly currently not available for `arm64`. **In the case of an `arm64` architecture you will have to go for a compilation from source as described in the next section.** The corresponding Dockerfile for `amd64` can be found below. It is based on the installation guides for [`librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages) and [its ROS wrapper](https://github.com/IntelRealSense/realsense-ros/tree/ros2-beta).
 
 ```Dockerfile
 FROM ros:humble-perception
@@ -70,7 +70,7 @@ ARG DEBIAN_FRONTEND=dialog
 ```
 
 ### 1.2 Installation from source
-The installation from source is slightly more involved but more general. It might work with ROS2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
+The installation from source is slightly more involved but more general. It might work with ROS2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while) as well as with **architectures for which no Debian packages are available such as `arm64`** (e.g. the Nvidia Jetson family, see [issue #1](https://github.com/2b-t/realsense-ros2-docker/issues/1#)). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
 
 ```Dockerfile
 ARG BASE_IMAGE=ros:humble-perception
@@ -209,7 +209,7 @@ $ ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true
 ```
 and in another terminal the ROS visualiser Rviz
 ```shell
-$ rosrun rviz2 rviz2
+$ ros2 run rviz2 rviz2
 ```
 In Rviz you can then display the topics published by the Realsense. For the list of available topics use
 ```shell
@@ -223,6 +223,6 @@ to find out what display type has to be selected in Rviz.
 
 ## 3. Debugging
 
-The Intel Realsense driver has several serious flaws/bugs. Probably the main one is that it is **closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360)**. If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported. Furthermore from time to time the software will give you cryptic error messages, for some restarting the corresponding software component might help, for others you will find a fix googling and with others you will have to learn to live.
-The Realsense are **pretty [picky about USB 3.x cables](https://github.com/IntelRealSense/librealsense/issues/2045)**. If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
+The Intel Realsense driver has several serious flaws/bugs. Probably the main one is that it is **closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360)**. If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported. Furthermore from time to time the software will give you cryptic error messages. For some restarting the corresponding software component might help, for others you will find a fix googling and with others you will have to learn to live.
+The Realsense is **pretty [picky about USB 3.x cables](https://github.com/IntelRealSense/librealsense/issues/2045)**. If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
 
