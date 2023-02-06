@@ -1,8 +1,10 @@
-[![build](https://github.com/2b-t/realsense-ros2-docker/workflows/build/badge.svg)](https://github.com/2b-t/realsense-ros2-docker/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 # Docker for Intel Realsense cameras on ROS2
 
 Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022 - February 2023)
+
+[![build](https://github.com/2b-t/realsense-ros2-docker/workflows/build/badge.svg)](https://github.com/2b-t/realsense-ros2-docker/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 
 ## 0. Overview
 This repository contains a Docker and all the documentation required to launch an [Intel Realsense camera](https://www.intel.co.uk/content/www/uk/en/architecture-and-technology/realsense-overview.html) with the [Robot Operating System ROS2](https://docs.ros.org/en/humble/index.html).
@@ -12,7 +14,7 @@ There are two different approaches for creating a Docker for a Realsense camera,
 
 In the `docker-compose.yml` this is done with the options:
 
-```json
+```yaml
     volumes:
       - /dev:/dev
     device_cgroup_rules:
