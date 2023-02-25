@@ -1,4 +1,4 @@
-# Docker for Intel Realsense cameras on ROS2
+# Docker for Intel Realsense cameras on ROS 2
 
 Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022 - February 2023)
 
@@ -7,7 +7,7 @@ Author: [Tobit Flatscher](https://github.com/2b-t) (June 2022 - February 2023)
 
 
 ## 0. Overview
-This repository contains a Docker and all the documentation required to launch an [Intel Realsense camera](https://www.intel.co.uk/content/www/uk/en/architecture-and-technology/realsense-overview.html) with the [Robot Operating System ROS2](https://docs.ros.org/en/humble/index.html).
+This repository contains a Docker and all the documentation required to launch an [Intel Realsense camera](https://www.intel.co.uk/content/www/uk/en/architecture-and-technology/realsense-overview.html) with the [Robot Operating System ROS 2](https://docs.ros.org/en/humble/index.html).
 
 ## 1. Creating a Docker
 There are two different approaches for creating a Docker for a Realsense camera, one uses existing **Debian packages** while the other performs a full **compilation from source**. It is then important to mount `/dev` as a volume so that the Docker can access the hardware.
@@ -72,7 +72,7 @@ ARG DEBIAN_FRONTEND=dialog
 ```
 
 ### 1.2 Installation from source
-The installation from source is slightly more involved but more general. It might work with ROS2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while) as well as with **architectures for which no Debian packages are available such as `arm64`** (e.g. the Nvidia Jetson family, see [issue #1](https://github.com/2b-t/realsense-ros2-docker/issues/1#)). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
+The installation from source is slightly more involved but more general. It might work with ROS 2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while) as well as with **architectures for which no Debian packages are available such as `arm64`** (e.g. the Nvidia Jetson family, see [issue #1](https://github.com/2b-t/realsense-ros2-docker/issues/1#)). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
 
 ```Dockerfile
 ARG BASE_IMAGE=ros:humble-perception
@@ -205,7 +205,7 @@ Then continue to launch the proprietary visualisation applet
 ```shell
 $ realsense-viewer
 ```
-Turn on the camera inside the application, see if you can see a three-dimensional image. Finally we can **launch the ROS2 wrapper**
+Turn on the camera inside the application, see if you can see a three-dimensional image. Finally we can **launch the ROS 2 wrapper**
 ```shell
 $ ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true
 ```
