@@ -6,9 +6,6 @@ services:
       dockerfile: docker/Dockerfile
       #target: librealsense
     tty: true
-    #stdin_open: true
-    privileged: true
-    network_mode: host
     volumes:
       - /dev:/dev
     device_cgroup_rules:
