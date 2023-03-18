@@ -1,7 +1,7 @@
 {
-  "name": "Docker Realsense ROS2",
+  "name": "Docker for Intel Realsense with ROS 2",
   "dockerComposeFile": [
-    "../docker/docker-compose-gui.yml" // Alternatives: "../docker/docker-compose.yml", "../docker/docker-compose-gui-nvidia.yml", "../docker/docker-compose-nvidia.yml"
+    "../docker/docker-compose-gui.yml" // Alternatives: "../docker/docker-compose-gui.yml", "../docker/docker-compose-gui-nvidia.yml"
   ],
   "service": "realsense_ros2",
 	"workspaceFolder": "/ros2_ws",
