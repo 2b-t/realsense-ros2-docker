@@ -61,7 +61,7 @@ ARG DEBIAN_FRONTEND=dialog
 ```
 
 ### 1.2 Installation from source
-The installation from source is slightly more involved but more general. It might work with ROS 2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while) as well as with **architectures for which no Debian packages are available such as `arm64`** (e.g. the Nvidia Jetson family, see [issue #1](https://github.com/2b-t/realsense-ros2-docker/issues/1#)). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
+The installation from source is slightly more involved but more general: It might work with ROS 2 distributions before the support is officially added (as used to be the case for ROS Humble for quite a while). In order to optimise memory usage a [multi-stage build](https://docs.docker.com/develop/develop-images/multistage-build/) is performed. The Dockerfile is inspired by the [Dockerfile of `librealsense`](https://github.com/IntelRealSense/librealsense/blob/master/scripts/Docker/Dockerfile) contributed by community members:
 
 ```Dockerfile
 ARG BASE_IMAGE=ros:humble-perception
@@ -214,9 +214,13 @@ to find out what display type has to be selected in Rviz.
 
 ## 3. Debugging
 
-- The Intel Realsense driver has several serious flaws/bugs. Probably the main one is that it is **closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360)**. If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported. Furthermore from time to time the software will give you cryptic error messages. For some restarting the corresponding software component might help, for others you will find a fix googling and with others you will have to learn to live.
+The Intel Realsense driver has several serious flaws/bugs. In case this Docker image does not work for you please have a look at the [issues on `realsense-ros`](https://github.com/IntelRealSense/realsense-ros/issues) to see if somebody has encountered the same issue already. Issues you might encounter are likely related to the underlying fragile library itself.
+
+- The driver is **closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360)**. If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported.
 
 - The Realsense is **pretty [picky about USB 3.x cables](https://github.com/IntelRealSense/librealsense/issues/2045)**. If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
+
+- The Realsense ROS driver itself is known for **struggling with [Nvidia Jetson embedded computers](https://github.com/IntelRealSense/realsense-ros/issues?q=jetson+) and [Raspberry Pi single-board computers](https://github.com/IntelRealSense/realsense-ros/issues?q=raspberry)**. Some users seem to have had success by up- or downgrading the versions of `librealsense` and/or the camera firmware but it might as well be that you find exactly the issue that you are encountering but it was never solved and closed due to inactivity (see also the issues [#2](https://github.com/2b-t/realsense-ros2-docker/issues/2) and [#4](https://github.com/2b-t/realsense-ros2-docker/issues/4)).
 
 - A useful tool to check if the Realsense is working properly without ROS is the Realsense viewer. It can be installed as discussed in [issue #3](https://github.com/2b-t/realsense-ros2-docker/issues/3) and launched with:
 
