@@ -190,10 +190,6 @@ and see if you can **detect it from inside the Docker** by typing inside the Doc
 ```shell
 $ rs-enumerate-devices --compact
 ```
-Then continue to launch the proprietary visualisation applet
-```shell
-$ realsense-viewer
-```
 Turn on the camera inside the application, see if you can see a three-dimensional image. Finally we can **launch the ROS 2 wrapper**
 ```shell
 $ ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true
@@ -221,6 +217,12 @@ to find out what display type has to be selected in Rviz.
 - The Intel Realsense driver has several serious flaws/bugs. Probably the main one is that it is **closely connected to the [kernel version of the Linux operating system](https://github.com/IntelRealSense/librealsense/issues/9360)**. If the Dockerfile above do not work then you are likely unlucky and it is an incompatible version of the kernel of your host system and you will either have to [downgrade your kernel](https://linuxhint.com/install-linux-kernel-ubuntu/) or switch to another Ubuntu version that is officially supported. Furthermore from time to time the software will give you cryptic error messages. For some restarting the corresponding software component might help, for others you will find a fix googling and with others you will have to learn to live.
 
 - The Realsense is **pretty [picky about USB 3.x cables](https://github.com/IntelRealSense/librealsense/issues/2045)**. If your camera is detected via `rs-enumerate-devices`, you can see it `realsense-viewer` but can't output its video stream, then it might be that your cable lacks the bandwidth. Either you can try to turn down the resolution of the camera in the `realsense-viewer` or switch cable (preferably to one that is [already known to work](https://community.intel.com/t5/Items-with-no-label/long-USB-cable-for-realsense-D435i/m-p/694963)).
+
+- A useful tool to check if the Realsense is working properly without ROS is the Realsense viewer. It can be installed as discussed in [issue #3](https://github.com/2b-t/realsense-ros2-docker/issues/3) and launched with:
+
+  ```shell
+  $ realsense-viewer
+  ```
 
 - In case you want to also use the **IMU** present in some Realsense models such as the D435i with e.g.
   ```
